@@ -1,0 +1,27 @@
+name: report
+
+inputs:
+  artifact:
+    type:     string
+    required: true
+  digest:
+    type:     string
+    required: true
+  manifest:
+    type:     string
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 19
+    - run: node $GITHUB_ACTION_PATH/action.mjs
+      env:
+        artifact: ${{ inputs.artifact   }}
+        digest:   ${{ inputs.digest     }}
+        source:   ${{ github.repository }}
+        commit:   ${{ github.sha        }}
+        manifest: ${{ inputs.manifest   }}
+      shell: bash

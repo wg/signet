@@ -1,0 +1,8 @@
+[target.'cfg(any(target_env = "musl", windows))']
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.'cfg(target_env = "musl")']
+rustflags = ["-C", "linker=rust-lld"]
+
+[target.'cfg(windows)']
+rustflags = ["-C", "link-args=/Brepro"]

@@ -1,0 +1,36 @@
+name: upload
+
+inputs:
+  artifact:
+    type:     string
+    required: true
+  binary:
+    type:     string
+    required: true
+  location:
+    type:     string
+    required: true
+  manifest:
+    type:     string
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 19
+    - run: node $GITHUB_ACTION_PATH/action.mjs
+      env:
+        artifact: ${{ inputs.artifact }}
+        binary:   ${{ inputs.binary   }}
+        location: ${{ inputs.location }}
+        manifest: ${{ inputs.manifest }}
+      shell: bash
+      id: setup
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.artifact }}
+        path: |
+          ${{ steps.setup.outputs.binary   }}
+          ${{ steps.setup.outputs.manifest }}

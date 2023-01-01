@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            runner: macos-12
+          - target: aarch64-pc-windows-msvc
+            runner: windows-2022
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-22.04
+          - target: x86_64-apple-darwin
+            runner: macos-12
+          - target: x86_64-pc-windows-msvc
+            runner: windows-2022
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-22.04
+    runs-on: ${{ matrix.runner }}
+    name: build ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: wg/actions/rust/build@master
+        with:
+          target: ${{ matrix.target }}
+        id: build
+      - uses: ./.github/actions/upload
+        with:
+          artifact: ${{ steps.build.outputs.artifact }}
+          binary:   ${{ steps.build.outputs.binary   }}
+          location: ${{ steps.build.outputs.location }}
+          manifest: ${{ steps.build.outputs.manifest }}
+      - uses: ./.github/actions/report
+        with:
+          artifact: ${{ steps.build.outputs.artifact }}
+          digest:   ${{ steps.build.outputs.digest   }}
+          manifest: ${{ steps.build.outputs.manifest }}
